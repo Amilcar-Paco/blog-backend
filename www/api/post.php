@@ -20,20 +20,22 @@ $postId = isset($path[3]) ? $path[3] : null;
 if ($requestMethod == 'POST') {
     // Handle post creation
     $data = json_decode(file_get_contents("php://input"));
-    
+
     // Check if all required fields are provided
-    if (!empty($postId) && !empty($data->title) && !empty($data->body)) {
+    if (!empty($data->title) && !empty($data->body) && !empty($data->category_id)) {
         // Create query
-        $query = "INSERT INTO posts (user_id, title, body) VALUES (:userId, :title, :body)";
-        
+        $query = "INSERT INTO posts (user_id, title, category_id, body) VALUES (:userId, :title, :category_id, :body)";
+
         // Prepare statement
         $stmt = $db->prepare($query);
-        
+
         // Bind parameters
-        $stmt->bindParam(":userId", $postId);
+        $userId = 1; // assuming user_id is 1 for this example
+        $stmt->bindParam(":userId", $userId);
         $stmt->bindParam(":title", $data->title);
+        $stmt->bindParam(":category_id", $data->category_id);
         $stmt->bindParam(":body", $data->body);
-        
+
         // Execute query
         if ($stmt->execute()) {
             echo json_encode(["message" => "Post created successfully"]);
@@ -76,15 +78,15 @@ if ($requestMethod == 'POST') {
         if (!empty($data->title) && !empty($data->body)) {
             // Create query
             $query = "UPDATE posts SET title = :title, body = :body WHERE id = :postId";
-            
+
             // Prepare statement
             $stmt = $db->prepare($query);
-            
+
             // Bind parameters
             $stmt->bindParam(":title", $data->title);
             $stmt->bindParam(":body", $data->body);
             $stmt->bindParam(":postId", $postId);
-            
+
             // Execute query
             if ($stmt->execute()) {
                 echo json_encode(["message" => "Post updated successfully"]);
@@ -102,13 +104,13 @@ if ($requestMethod == 'POST') {
     if (!empty($postId)) {
         // Create query
         $query = "DELETE FROM posts WHERE id = :postId";
-        
+
         // Prepare statement
         $stmt = $db->prepare($query);
-        
+
         // Bind parameters
         $stmt->bindParam(":postId", $postId);
-        
+
         // Execute query
         if ($stmt->execute()) {
             echo json_encode(["message" => "Post deleted successfully"]);
