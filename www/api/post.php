@@ -32,7 +32,7 @@ if ($requestMethod == 'POST') {
     // Check if all required fields are provided
     if (!empty($data->title) && !empty($data->body) && !empty($data->category_id)) {
         // Create query
-        $query = "INSERT INTO posts (user_id, title, category_id, body) VALUES (:userId, :title, :category_id, :body)";
+        $query = "INSERT INTO posts (user_id, title, category_id,image, body) VALUES (:userId, :title, :category_id, :image, :body)";
 
         // Prepare statement
         $stmt = $db->prepare($query);
@@ -42,6 +42,7 @@ if ($requestMethod == 'POST') {
         $stmt->bindParam(":userId", $userId);
         $stmt->bindParam(":title", $data->title);
         $stmt->bindParam(":category_id", $data->category_id);
+        $stmt->bindParam(":image", $data->image);
         $stmt->bindParam(":body", $data->body);
 
         // Execute query
