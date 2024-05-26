@@ -1,4 +1,12 @@
 <?php
+
+header("Content-Type: application/json");
+// Allow requests from all origins
+header("Access-Control-Allow-Origin: *");
+// Allow specific methods
+header("Access-Control-Allow-Methods: GET, POST, PUT, DELETE");
+// Allow specific headers
+header("Access-Control-Allow-Headers: Origin, Content-Type, Accept, Authorization");
 header("Content-Type: application/json");
 include_once 'db.php';
 
