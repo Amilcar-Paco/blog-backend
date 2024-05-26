@@ -30,8 +30,21 @@ if ($requestMethod == 'POST') {
     
     // Check if all required fields are provided
     if (!empty($data->post_id) && !empty($data->user_id) && !empty($data->body)) {
+        // Check if it's a reply to a comment
+        $reply = !empty($_GET['reply']) && $_GET['reply'] === 'true';
+        
         // Create query
-        $query = "INSERT INTO comments (post_id, user_id, body) VALUES (:post_id, :user_id, :body)";
+        $query = "INSERT INTO comments (post_id, user_id, body";
+        if ($reply && !empty($data->parent_comment_id)) {
+            // If it's a reply, include parent_comment_id in the query
+            $query .= ", parent_comment_id";
+        }
+        $query .= ") VALUES (:post_id, :user_id, :body";
+        if ($reply && !empty($data->parent_comment_id)) {
+            // If it's a reply, include parent_comment_id in the parameters
+            $query .= ", :parent_comment_id";
+        }
+        $query .= ")";
         
         // Prepare statement
         $stmt = $db->prepare($query);
@@ -40,6 +53,10 @@ if ($requestMethod == 'POST') {
         $stmt->bindParam(":post_id", $data->post_id);
         $stmt->bindParam(":user_id", $data->user_id);
         $stmt->bindParam(":body", $data->body);
+        if ($reply && !empty($data->parent_comment_id)) {
+            // If it's a reply, bind parent_comment_id parameter
+            $stmt->bindParam(":parent_comment_id", $data->parent_comment_id);
+        }
         
         // Execute query
         if ($stmt->execute()) {
@@ -127,3 +144,4 @@ if ($requestMethod == 'POST') {
 } else {
     echo json_encode(["message" => "Invalid request method"]);
 }
+?>
